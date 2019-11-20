@@ -1,0 +1,50 @@
+ pipeline {
+ agent any
+ stages {
+ stage ('Checkout git repo') {
+         steps {
+	                git branch: 'master',
+			                credentialsId: 'xxxxxxxxx',
+					                url: 'https://github.com/devitest/myrepo.git'
+							                sh "ls -lat"
+									        }
+										    }
+										    stage ('Docker Operation') {
+										    steps {
+										        dockerfile {
+											            filename 'Dockerfile'
+												                dir '.'
+														        }
+															    }
+															    }
+															            stage ('Test') {
+																                steps {
+																		                sh 'docker build -t mygitimage .'
+																				            }
+																					            }
+																						    stage ('Heroku Deployment') {
+																						    steps {
+																						    sh '''
+																						    {
+																						    docker login --username=_ --password=(satapathydeviprasad60@gmail.com:marshaghaI5?) registry.heroku.com
+																						    heroku container:push mygitimage
+																						    docker tag mygitimage registry.heroku.com/<app>/<process-type>
+																						    tagname=$branch-{date '+Y+m+D+H+s'}
+																						    docker push registry.heroku.com/$tagname/<app>/<process-type>
+																						    '''
+																						    }
+																						    }
+																						    }
+																						    stage ('Release Image') {
+																						    steps {
+																						    script {
+																						    sh 'heroku container:release web release'
+																						    }
+																						    }
+																						    }
+																						    }
+																						    post {
+																						    always{
+																						    echo 'cleanWs()'
+																						    }
+																						            }
